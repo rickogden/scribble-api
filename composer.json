@@ -1,0 +1,6 @@
+{
+    "name": "ricklab/silex-skeleton",
+    "require": {
+        "silex/silex": "~1.2"
+    }
+}
