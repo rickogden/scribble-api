@@ -1,6 +1,14 @@
 {
     "name": "ricklab/silex-skeleton",
+    "version": "1.0",
+    "authors":[{
+        "name":"Rick Ogden",
+        "email":"rick@rickogden.com",
+        "homepage":"http://www.rickogden.com",
+        "role":"developer"
+    }],
     "require": {
+        "php": ">=5.4",
         "silex/silex": "~1.2"
     }
 }
