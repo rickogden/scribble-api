@@ -39,6 +39,17 @@ $app->post( '/', function ( Request $request ) use ( $app ) {
 		return $app->json( [ 'errors' => $return ], 400 );
 	}
 
+	// check for profanity
+	/** @var \Fastwebmedia\ProfanityFilter\ProfanityFilter $profanityService */
+	$profanityService = $app['profanity_checker'];
+
+	if ( ! $profanityService->check( $data['submitter'] ) ||
+	     ! $profanityService->check( $data['email'] ) ||
+	     ! $profanityService->check( $data['message'] )
+	) {
+		return $app->abort( 400, 'Profanity detected' );
+	}
+
 	/** @var MongoDB $mongodb */
 	$mongodb = $app['mongodb'];
 

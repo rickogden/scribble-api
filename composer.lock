@@ -4,8 +4,50 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f7cc6f419b4842718a9911aedff8ab6c",
+    "hash": "b41b7bc277ecfeef51acf43bdd63b15a",
     "packages": [
+        {
+            "name": "fastwebmedia/profanity-filter",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fastwebmedia/Profanity-Filter.git",
+                "reference": "d5da4508e355c4112e2d8d088871db10268af0b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fastwebmedia/Profanity-Filter/zipball/d5da4508e355c4112e2d8d088871db10268af0b9",
+                "reference": "d5da4508e355c4112e2d8d088871db10268af0b9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Fastwebmedia\\ProfanityFilter": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Fast Web Media Ltd",
+                    "email": "packages@fastwebmedia.com"
+                }
+            ],
+            "description": "Profanity filter for checking and sanitizing user input",
+            "keywords": [
+                "bad words",
+                "filter",
+                "php",
+                "profanity"
+            ],
+            "time": "2014-12-06 12:01:41"
+        },
         {
             "name": "pimple/pimple",
             "version": "v1.1.1",

@@ -10,6 +10,7 @@
     "require": {
         "php": ">=5.4",
         "silex/silex": "~1.3@dev",
-        "symfony/validator": "~2.6"
+        "symfony/validator": "~2.6",
+        "fastwebmedia/profanity-filter": "1.1.*"
     }
 }
