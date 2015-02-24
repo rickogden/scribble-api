@@ -3,28 +3,48 @@
 use \Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use \Symfony\Component\HttpFoundation\Response;
+use \Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 /**
  * @var Silex\Application $app
  */
-$app = require_once __DIR__.'/bootstrap.php';
+$app = require_once __DIR__ . '/bootstrap.php';
 
-$app['constraints.message'] = new Assert\Collection( [
-	'submitter' => new Assert\NotBlank(),
-	'email'     => new Assert\Email(),
-	'message'   => new Assert\NotBlank()
-] );
+$app['constraints.message'] = $app->share( function ( \Silex\Application $app ) {
 
-$app->post( '/', function ( Request $request ) use ( $app ) {
+	$profanityCallback = function ( $object, ExecutionContextInterface $meta ) use ( $app ) {
+
+		/** @var \Fastwebmedia\ProfanityFilter\ProfanityFilter $profanityService */
+		$profanityService = $app['profanity_checker'];
+		if ( ! $profanityService->check( $object ) ) {
+			$meta->buildViolation( 'profanity detected.' )
+			     ->addViolation();
+		}
+	};
+
+	$constraints = new Assert\Collection( [
+		'submitter' => [ new Assert\Callback( $profanityCallback ), new Assert\NotBlank() ],
+		'email'     => new Assert\Email(),
+		'message'   => [
+			new Assert\Length( [
+				'min' => 1,
+				'max' => 240
+			] ),
+			new Assert\Callback( $profanityCallback )
+		]
+	] );
+
+	return $constraints;
+} );
 
 
+$validator              = function ( Request $request, Silex\Application $app ) {
 	/** @var \Symfony\Component\Validator\ValidatorInterface $validator */
 	$validator = $app['validator'];
 
 
 	// retrieve the data from the POST request
-	$data['submitter'] = $request->request->get( 'submitter', 'Anon' );
-	$data['email']     = $request->request->get( 'email' );
-	$data['message']   = $request->request->get( 'message' );
+	$data = $request->request->all();
 
 	// validate user inputted data.
 	$errors = $validator->validate( $data, $app['constraints.message'] );
@@ -38,17 +58,15 @@ $app->post( '/', function ( Request $request ) use ( $app ) {
 
 		return $app->json( [ 'errors' => $return ], 400 );
 	}
+};
 
-	// check for profanity
-	/** @var \Fastwebmedia\ProfanityFilter\ProfanityFilter $profanityService */
-	$profanityService = $app['profanity_checker'];
+$app->post( '/', function ( Request $request ) use ( $app ) {
 
-	if ( ! $profanityService->check( $data['submitter'] ) ||
-	     ! $profanityService->check( $data['email'] ) ||
-	     ! $profanityService->check( $data['message'] )
-	) {
-		return $app->abort( 400, 'Profanity detected' );
-	}
+	// retrieve the data from the POST request
+	$data['submitter'] = $request->request->get( 'submitter', 'Anon' );
+	$data['email']     = $request->request->get( 'email' );
+	$data['message']   = $request->request->get( 'message' );
+
 
 	/** @var MongoDB $mongodb */
 	$mongodb = $app['mongodb'];
@@ -57,7 +75,7 @@ $app->post( '/', function ( Request $request ) use ( $app ) {
 
 	// Additional data to be entered into database
 	$data['ip']          = $request->getClientIp();
-	$data['submitDate']  = new MongoDate();
+	$data['submitDate'] = ( new DateTime )->format( 'c' );
 	$data['messageType'] = 'website';
 
 	if ( $collection->insert( $data ) ) {
@@ -68,8 +86,12 @@ $app->post( '/', function ( Request $request ) use ( $app ) {
 
 
 	// This should never be reached unless something has gone wrong with the insert.
-	$app->abort( 500, "Something has gone wrong with this application." );
+	return $app->abort( 500, "Something has gone wrong with this application." );
 
-} );
+} )->before( $validator );
+
+$app->post( '/validate', function () use ( $app ) {
+	return new Response( 'OK', 200 );
+} )->before( $validator );
 
 return $app;
