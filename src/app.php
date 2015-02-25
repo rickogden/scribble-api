@@ -96,7 +96,7 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 } )->before( $validator );
 
 $app->post( '/validate', function () use ( $app ) {
-	return new Response( 'OK', 200 );
+	return new Response( null, 204 );
 } )->before( $validator );
 
 return $app;
