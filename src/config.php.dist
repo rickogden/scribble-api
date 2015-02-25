@@ -5,3 +5,4 @@ $app['mongo.server.port']     = '';
 $app['mongo.server.username'] = '';
 $app['mongo.server.password'] = '';
 $app['mongo.server.db']       = '';
+$app['message.throttle'] = 600;

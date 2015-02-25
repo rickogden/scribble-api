@@ -44,12 +44,41 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 
 
 $validator              = function ( Request $request, Silex\Application $app ) {
+
+	/** @var MongoDB $mongodb */
+	$mongodb = $app['mongodb'];
+
+	$collection = $mongodb->selectCollection( 'messages' );
+
 	/** @var \Symfony\Component\Validator\ValidatorInterface $validator */
 	$validator = $app['validator'];
 
 
 	// retrieve the data from the POST request
 	$data = $request->request->all();
+
+	// make sure not spamming
+	if ( isset( $data['messageType'] ) ) {
+		$queries = $collection->find( [
+			'ts'        => [ '$gt' => new MongoDate( time() - $app['message.throttle'] ) ],
+			'submitter' => $data['submitter']
+		] )->count();
+
+		if ( $queries > 0 ) {
+			return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes', 418 );
+		}
+	} else {
+
+		$queries = $collection->find( [
+			'ts' => [ '$gt' => new MongoDate( time() - $app['message.throttle'] ) ],
+			'ip' => $request->getClientIp()
+		] )->count();
+
+		if ( $queries > 0 ) {
+			return new Response( 'Too many messages from this IP. Please wait 10 minutes', 418 );
+		}
+
+	}
 
 	// validate user inputted data.
 	$errors = $validator->validate( $data, $app['constraints.message'] );
@@ -71,6 +100,7 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 	$data['submitter'] = $request->request->get( 'submitter', 'Anon' );
 	$data['email']     = $request->request->get( 'email' );
 	$data['message']   = $request->request->get( 'message' );
+	$data['messageType'] = $request->request->get( 'messageType', 'website' );;
 
 
 	/** @var MongoDB $mongodb */
@@ -81,7 +111,8 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 	// Additional data to be entered into database
 	$data['ip']          = $request->getClientIp();
 	$data['submitDate'] = ( new DateTime )->format( 'c' );
-	$data['messageType'] = 'website';
+	$data['hasPrinted'] = false;
+	$data['ts'] = new MongoDate();
 
 	if ( $collection->insert( $data ) ) {
 
