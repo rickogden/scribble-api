@@ -23,9 +23,14 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 	};
 
 	$constraints = new Assert\Collection( [
-		'submitter' => [ new Assert\Callback( $profanityCallback ), new Assert\NotBlank() ],
+		'submitter' => [
+			new Assert\Callback( $profanityCallback ),
+			new Assert\NotBlank(),
+			new Assert\Length( [ 'max' => 50 ] )
+		],
 		'email'     => new Assert\Email(),
 		'message'   => [
+			new Assert\NotBlank(),
 			new Assert\Length( [
 				'min' => 1,
 				'max' => 240
