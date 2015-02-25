@@ -85,7 +85,7 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	if ( $collection->insert( $data ) ) {
 
-		return new Response( null, 201 );
+		return new Response( 'Created', 201 );
 
 	}
 
