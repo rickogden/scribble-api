@@ -17,7 +17,7 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 		/** @var \Fastwebmedia\ProfanityFilter\ProfanityFilter $profanityService */
 		$profanityService = $app['profanity_checker'];
 		if ( ! $profanityService->check( $object ) ) {
-			$meta->buildViolation( 'profanity detected.' )
+			$meta->buildViolation( 'Please don\'t swear.' )
 			     ->addViolation();
 		}
 	};
