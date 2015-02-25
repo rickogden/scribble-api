@@ -60,7 +60,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 	}
 };
 
-$app->post( '/', function ( Request $request ) use ( $app ) {
+$app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// retrieve the data from the POST request
 	$data['submitter'] = $request->request->get( 'submitter', 'Anon' );

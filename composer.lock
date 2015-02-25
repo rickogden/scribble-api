@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b41b7bc277ecfeef51acf43bdd63b15a",
+    "hash": "b340050bdb017d887fdbf9b8c314924a",
     "packages": [
         {
             "name": "fastwebmedia/profanity-filter",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fastwebmedia/Profanity-Filter.git",
-                "reference": "d5da4508e355c4112e2d8d088871db10268af0b9"
+                "reference": "3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fastwebmedia/Profanity-Filter/zipball/d5da4508e355c4112e2d8d088871db10268af0b9",
-                "reference": "d5da4508e355c4112e2d8d088871db10268af0b9",
+                "url": "https://api.github.com/repos/fastwebmedia/Profanity-Filter/zipball/3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22",
+                "reference": "3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22",
                 "shasum": ""
             },
             "require": {
@@ -46,7 +46,7 @@
                 "php",
                 "profanity"
             ],
-            "time": "2014-12-06 12:01:41"
+            "time": "2015-02-24 11:28:26"
         },
         {
             "name": "pimple/pimple",
