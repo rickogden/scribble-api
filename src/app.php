@@ -22,7 +22,7 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 		}
 	};
 
-	$constraints = new Assert\Collection( [
+	$constraints = new Assert\Collection( [ 'fields' => [
 		'submitter' => [
 			new Assert\Callback( $profanityCallback ),
 			new Assert\NotBlank([
@@ -42,7 +42,9 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 			] ),
 			new Assert\Callback( $profanityCallback )
 		]
-	] );
+	],
+        'allowExtraFields' => true
+    ]);
 
 	return $constraints;
 } );
