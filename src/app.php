@@ -131,12 +131,12 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// message type specific data
 	if ( $data['messageType'] === 'tweet' ) {
-        try {
-            $date = DateTime::createFromFormat('D, j M Y H:i:s +0000', $request->request->get('submitDate'));
-
-        } catch (Exception $e) {
-            $date = new DateTime();
-        }
+   //     try {
+   //         $date = DateTime::createFromFormat('D, j M Y H:i:s +0000', $request->request->get('submitDate'));
+  //
+    //    } catch (Exception $e) {
+            $date = new DateTime(strtotime($request->request->get('submitDate')));
+      //  }
         $data['submitDate'] = $date->format( 'c' );
 		$data['ts']         = new MongoDate( $date->getTimestamp() );
 	} else {
