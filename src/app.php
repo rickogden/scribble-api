@@ -58,26 +58,36 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 	$data = $request->request->all();
 
 	// make sure not spamming
-	if ( isset( $data['messageType'] ) ) {
-		$queries = $collection->find( [
-			'ts'        => [ '$gt' => new MongoDate( time() - $app['message.throttle'] ) ],
-			'submitter' => $data['submitter']
-		] )->count();
+	if ( in_array( $request->getClientIp(), $app['message.throttle.blacklist'] ) ) {
 
-		if ( $queries > 0 ) {
-			return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes.', 429 );
-		}
+		return new Response( 'You cannot create a message from this IP.', 403 );
+
 	} else {
 
-		$queries = $collection->find( [
-			'ts' => [ '$gt' => new MongoDate( time() - $app['message.throttle'] ) ],
-			'ip' => $request->getClientIp()
-		] )->count();
+		if ( isset( $data['token'] ) && $data['token'] === $app['tweet.token'] ) {
+			$queries = $collection->find( [
+				'ts'        => [ '$gt' => new MongoDate( time() - $app['message.throttle.seconds'] ) ],
+				'submitter' => $data['submitter']
+			] )->count();
 
-		if ( $queries > 0 ) {
-			return new Response( 'Too many messages from this IP. Please wait 10 minutes.', 429 );
+			if ( $queries > $app['message.throttle.count'] - 1 ) {
+				return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes.', 429 );
+			}
+		} else {
+
+			if ( ! in_array( $request->getClientIp(), $app['message.throttle.whitelist'] ) ) {
+
+				$queries = $collection->find( [
+					'ts' => [ '$gt' => new MongoDate( time() - $app['message.throttle.seconds'] ) ],
+					'ip' => $request->getClientIp()
+				] )->count();
+
+				if ( $queries > $app['message.throttle.count'] - 1 ) {
+					return new Response( 'Too many messages from this IP. Please wait 10 minutes.', 429 );
+				}
+			}
+
 		}
-
 	}
 
 	// validate user inputted data.
@@ -100,8 +110,24 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 	$data['submitter'] = $request->request->get( 'submitter', 'Anon' );
 	$data['email']     = $request->request->get( 'email' );
 	$data['message']   = $request->request->get( 'message' );
-	$data['messageType'] = $request->request->get( 'messageType', 'website' );;
+	$token              = $request->request->get( 'token' );
 
+	if ( $token !== null && $token === $app['tweet.token'] ) {
+		$data['messageType'] = 'tweet';
+	} else {
+		$data['messageType'] = 'website';
+	}
+
+	// message type specific data
+	if ( $data['messageType'] === 'tweet' ) {
+		$date               = new DateTime( $request->request->get( 'submitDate' ) );
+		$data['submitDate'] = $date->format( 'c' );
+		$data['ts']         = new MongoDate( $date->getTimestamp() );
+	} else {
+
+		$data['submitDate'] = ( new DateTime )->format( 'c' );
+		$data['ts']         = new MongoDate();
+	}
 
 	/** @var MongoDB $mongodb */
 	$mongodb = $app['mongodb'];
@@ -110,9 +136,7 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// Additional data to be entered into database
 	$data['ip']          = $request->getClientIp();
-	$data['submitDate'] = ( new DateTime )->format( 'c' );
 	$data['hasPrinted'] = false;
-	$data['ts'] = new MongoDate();
 
 	if ( $collection->insert( $data ) ) {
 
