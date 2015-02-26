@@ -72,14 +72,18 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 	} else {
 
 		if ( isset( $data['token'] ) && $data['token'] === $app['tweet.token'] ) {
-			$queries = $collection->find( [
-				'ts'        => [ '$gt' => new MongoDate( time() - $app['message.throttle.seconds'] ) ],
-				'submitter' => $data['submitter']
-			] )->count();
+            if(in_array($data['submitter'], $app['message.throttle.blacklist'])) {
+                return new Response( 'Twitter account forbidden.', 403 );
+            } elseif (! in_array( $data['submitter'], $app['message.throttle.whitelist'] ) ) {
+                $queries = $collection->find([
+                    'ts' => ['$gt' => new MongoDate(time() - $app['message.throttle.seconds'])],
+                    'submitter' => $data['submitter']
+                ])->count();
 
-			if ( $queries > $app['message.throttle.count'] - 1 ) {
-				return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes.', 429 );
-			}
+                if ($queries > $app['message.throttle.count'] - 1) {
+                    return new Response('Too many messages from this Twitter account. Please wait 10 minutes.', 429);
+                }
+            }
 		} else {
 
 			if ( ! in_array( $request->getClientIp(), $app['message.throttle.whitelist'] ) ) {
@@ -127,8 +131,13 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// message type specific data
 	if ( $data['messageType'] === 'tweet' ) {
-		$date               = new DateTime( $request->request->get( 'submitDate' ) );
-		$data['submitDate'] = $date->format( 'c' );
+        try {
+            $date = DateTime::createFromFormat('D, j M Y H:i:s +0000', $request->request->get('submitDate'));
+
+        } catch (Exception $e) {
+            $date = new DateTime();
+        }
+        $data['submitDate'] = $date->format( 'c' );
 		$data['ts']         = new MongoDate( $date->getTimestamp() );
 	} else {
 
