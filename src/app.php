@@ -65,7 +65,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 		] )->count();
 
 		if ( $queries > 0 ) {
-			return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes', 418 );
+			return new Response( 'Too many messages from this Twitter account. Please wait 10 minutes.', 429 );
 		}
 	} else {
 
@@ -75,7 +75,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 		] )->count();
 
 		if ( $queries > 0 ) {
-			return new Response( 'Too many messages from this IP. Please wait 10 minutes', 418 );
+			return new Response( 'Too many messages from this IP. Please wait 10 minutes.', 429 );
 		}
 
 	}
