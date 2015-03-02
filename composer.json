@@ -11,6 +11,7 @@
         "php": ">=5.4",
         "silex/silex": "~1.3@dev",
         "symfony/validator": "~2.6",
-        "fastwebmedia/profanity-filter": "1.1.*"
+        "fastwebmedia/profanity-filter": "1.1.*",
+        "monolog/monolog": "~1.12"
     }
 }

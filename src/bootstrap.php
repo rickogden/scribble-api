@@ -1,5 +1,9 @@
 <?php
 
+
+use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Component\HttpFoundation\Response;
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Silex\Application();
@@ -33,5 +37,23 @@ $app['profanity_checker'] = $app->share( function () {
 
 
 } );
+
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => __DIR__.'/../logs/error.log',
+    'monolog.level' => \Monolog\Logger::WARNING,
+    'monolog.name' => 'scribbler'
+));
+
+$app->finish(function(Request $request, Response $response, Silex\Application $app) {
+    if($response->getStatusCode() >= 400) {
+        /** @var Monolog\Logger $logger */
+        $logger = $app['monolog'];
+        $logger->log(400, $response->getStatusCode().': '. $response->getContent() ,[
+            'request' => $request->getContent(),
+            'ip' => $request->getClientIp()
+        ]);
+
+    }
+});
 
 return $app;
