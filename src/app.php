@@ -38,7 +38,7 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
                 'message' => 'This can\'t be left blank. Please fill it.'
             ]),
 			new Assert\Length( [
-				'max' => 240
+				'max' => 350
 			] ),
 			new Assert\Callback( $profanityCallback )
 		]
@@ -81,7 +81,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
                 ])->count();
 
                 if ($queries > $app['message.throttle.count'] - 1) {
-                    return new Response('Too many messages from this Twitter account. Please wait 10 minutes.', 429);
+	                return new Response( 'Too many messages from this Twitter account.', 429 );
                 }
             }
 		} else {
@@ -94,7 +94,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 				] )->count();
 
 				if ( $queries > $app['message.throttle.count'] - 1 ) {
-					return new Response( 'Too many messages from this IP. Please wait 10 minutes.', 429 );
+					return new Response( 'Too many messages from this IP.', 429 );
 				}
 			}
 
@@ -131,12 +131,7 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// message type specific data
 	if ( $data['messageType'] === 'tweet' ) {
-   //     try {
-   //         $date = DateTime::createFromFormat('D, j M Y H:i:s +0000', $request->request->get('submitDate'));
-  //
-    //    } catch (Exception $e) {
-            $date = new DateTime(strtotime($request->request->get('submitDate')));
-      //  }
+		$date = new DateTime( strtotime( $request->request->get( 'submitDate' ) ) );
         $data['submitDate'] = $date->format( 'c' );
 		$data['ts']         = new MongoDate( $date->getTimestamp() );
 	} else {
