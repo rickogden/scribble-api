@@ -64,6 +64,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 	// retrieve the data from the POST request
 	$data = $request->request->all();
 
+    $tweet = ( isset( $data['token'] ) && $data['token'] === $app['tweet.token'] );
 	// make sure not spamming
 	if ( in_array( $request->getClientIp(), $app['message.throttle.blacklist'] ) ) {
 
@@ -71,7 +72,7 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 
 	} else {
 
-		if ( isset( $data['token'] ) && $data['token'] === $app['tweet.token'] ) {
+		if ( $tweet ) {
             if(in_array($data['submitter'], $app['message.throttle.blacklist'])) {
                 return new Response( 'Twitter account forbidden.', 403 );
             } elseif (! in_array( $data['submitter'], $app['message.throttle.whitelist'] ) ) {
@@ -110,6 +111,22 @@ $validator              = function ( Request $request, Silex\Application $app ) 
 			$r        = [ 'message' => $error->getMessage(), 'field' => $error->getPropertyPath() ];
 			$return[] = $r;
 		}
+
+        if($tweet) {
+
+            /** @var MongoDB $mongodb */
+            $mongodb = $app['mongodb'];
+
+            $collection = $mongodb->selectCollection( 'messages' );
+
+            $collection->insert([
+                'submitter' => $data['submitter'],
+                'email' => $data['email'],
+                'message' => $data['message'],
+                'hasPrinted' => true,
+                'invalid' => $return
+            ]);
+        }
 
 		return $app->json( [ 'errors' => $return ], 400 );
 	}
