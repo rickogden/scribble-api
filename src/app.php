@@ -38,7 +38,7 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
                 'message' => 'This can\'t be left blank. Please fill it.'
             ]),
 			new Assert\Length( [
-				'max' => 350
+				'max' => $app['message.limit']
 			] ),
 			new Assert\Callback( $profanityCallback )
 		]

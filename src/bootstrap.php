@@ -16,7 +16,7 @@ require_once __DIR__ . '/config.php';
  */
 $app['mongodb'] = $app->share( function ( Silex\Application $app ) {
 	$client = new MongoClient( 'mongodb://' . $app['mongo.server.username'] . ':' . $app['mongo.server.password'] .
-	                           '@' . $app['mongo.server.hostname'] . ':' . $app['mongo.server.port'] . '/' . $app['mongo.server.db']
+	                           '@' . $app['mongo.server.hosts'] . '/' . $app['mongo.server.db']
 	);
 	$db     = $client->selectDB( $app['mongo.server.db'] );
 
@@ -31,7 +31,7 @@ $app['profanity_checker'] = $app->share( function () {
 
 	$config = require __DIR__ . '/../vendor/fastwebmedia/profanity-filter/src/config/config.php';
 
-	$filter = new \Fastwebmedia\ProfanityFilter\ProfanityFilter( $config['words'] );
+	$filter = new \Fastwebmedia\ProfanityFilter\ProfanityFilter( $config['words'], $config['whitelist'] );
 
 	return $filter;
 

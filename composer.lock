@@ -4,27 +4,27 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8d0e39e394ea1a5241c4a8ecb149ec96",
+    "hash": "bc45443fe12f2be779931c1c0c4b534e",
     "packages": [
         {
             "name": "fastwebmedia/profanity-filter",
-            "version": "1.1.1",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fastwebmedia/Profanity-Filter.git",
-                "reference": "3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22"
+                "reference": "85f782f3d4f827035e153edbac7ebce3561e91e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fastwebmedia/Profanity-Filter/zipball/3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22",
-                "reference": "3dc6a0a5cc4615b22866218b1f0ad5dfea8d1a22",
+                "url": "https://api.github.com/repos/fastwebmedia/Profanity-Filter/zipball/85f782f3d4f827035e153edbac7ebce3561e91e5",
+                "reference": "85f782f3d4f827035e153edbac7ebce3561e91e5",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*"
+                "phpunit/phpunit": "4.*"
             },
             "type": "library",
             "autoload": {
@@ -46,7 +46,7 @@
                 "php",
                 "profanity"
             ],
-            "time": "2015-02-24 11:28:26"
+            "time": "2015-03-03 18:00:31"
         },
         {
             "name": "monolog/monolog",
