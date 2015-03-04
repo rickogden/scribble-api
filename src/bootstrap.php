@@ -45,7 +45,7 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 ));
 
 $app->finish(function(Request $request, Response $response, Silex\Application $app) {
-    if($response->getStatusCode() >= 400) {
+    if($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
         /** @var Monolog\Logger $logger */
         $logger = $app['monolog'];
         $logger->log(400, $response->getStatusCode().': '. $response->getContent() ,[
