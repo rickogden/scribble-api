@@ -52,6 +52,8 @@ $app['constraints.message'] = $app->share( function ( \Silex\Application $app ) 
 
 $validator              = function ( Request $request, Silex\Application $app ) {
 
+    $request->request->set('message',html_entity_decode($request->request->get('message')));
+    $request->request->set('submitter',html_entity_decode($request->request->get('submitter')));
 	/** @var MongoDB $mongodb */
 	$mongodb = $app['mongodb'];
 
