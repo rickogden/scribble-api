@@ -168,6 +168,15 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 	$data['ip']          = $request->getClientIp();
 	$data['hasPrinted'] = false;
 
+    // Check for duplication
+    if($collection->find([
+        'submitter' => $data['submitter'],
+        'message' => $data['message']
+        ])->count() > 0) {
+        $app['monolog']->log(400, 'Message already exists.',$data);
+        return new Response(null, 204);
+    }
+
 	if ( $collection->insert( $data ) ) {
 
 		return new Response( null, 204 );
