@@ -150,7 +150,12 @@ $app->post( '/message', function ( Request $request ) use ( $app ) {
 
 	// message type specific data
 	if ( $data['messageType'] === 'tweet' ) {
-		$date = new DateTime( strtotime( urldecode($request->request->get( 'submitDate' )) ) );
+        try {
+            $date = new DateTime(strtotime(urldecode($request->request->get('submitDate'))));
+        } catch (Exception $exception) {
+            $app['monolog']->log(500,'cannot parse '. $request->request->get('submitDate'));
+            $date = new DateTime();
+        }
         $data['submitDate'] = $date->format( 'c' );
 		$data['ts']         = new MongoDate( $date->getTimestamp() );
 	} else {
